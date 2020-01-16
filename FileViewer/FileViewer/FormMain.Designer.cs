@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.menuStripMain = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,7 +50,9 @@
             this.toolStripMenuItemHelpVersionInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
             this.treeViewFile = new System.Windows.Forms.TreeView();
+            this.imageListSmallIcon = new System.Windows.Forms.ImageList(this.components);
             this.listViewFile = new System.Windows.Forms.ListView();
+            this.imageListLargeIcon = new System.Windows.Forms.ImageList(this.components);
             this.menuStripMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
@@ -141,7 +144,7 @@
             this.toolStripMenuItemEditCut.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripMenuItemEditCut.Name = "toolStripMenuItemEditCut";
             this.toolStripMenuItemEditCut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.toolStripMenuItemEditCut.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemEditCut.Size = new System.Drawing.Size(170, 22);
             this.toolStripMenuItemEditCut.Text = "切り取り(&T)";
             // 
             // toolStripMenuItemEditCopy
@@ -150,7 +153,7 @@
             this.toolStripMenuItemEditCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripMenuItemEditCopy.Name = "toolStripMenuItemEditCopy";
             this.toolStripMenuItemEditCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.toolStripMenuItemEditCopy.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemEditCopy.Size = new System.Drawing.Size(170, 22);
             this.toolStripMenuItemEditCopy.Text = "コピー(&C)";
             // 
             // toolStripMenuItemEditPaste
@@ -159,18 +162,18 @@
             this.toolStripMenuItemEditPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripMenuItemEditPaste.Name = "toolStripMenuItemEditPaste";
             this.toolStripMenuItemEditPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.toolStripMenuItemEditPaste.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemEditPaste.Size = new System.Drawing.Size(170, 22);
             this.toolStripMenuItemEditPaste.Text = "貼り付け(&P)";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(167, 6);
             // 
             // toolStripMenuItemEditSelectAll
             // 
             this.toolStripMenuItemEditSelectAll.Name = "toolStripMenuItemEditSelectAll";
-            this.toolStripMenuItemEditSelectAll.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemEditSelectAll.Size = new System.Drawing.Size(170, 22);
             this.toolStripMenuItemEditSelectAll.Text = "すべて選択(&A)";
             // 
             // toolStripMenuItemTool
@@ -184,7 +187,7 @@
             // toolStripMenuItemToolOption
             // 
             this.toolStripMenuItemToolOption.Name = "toolStripMenuItemToolOption";
-            this.toolStripMenuItemToolOption.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemToolOption.Size = new System.Drawing.Size(135, 22);
             this.toolStripMenuItemToolOption.Text = "オプション(&O)";
             // 
             // toolStripMenuItemHelp
@@ -198,7 +201,7 @@
             // toolStripMenuItemHelpVersionInfo
             // 
             this.toolStripMenuItemHelpVersionInfo.Name = "toolStripMenuItemHelpVersionInfo";
-            this.toolStripMenuItemHelpVersionInfo.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemHelpVersionInfo.Size = new System.Drawing.Size(167, 22);
             this.toolStripMenuItemHelpVersionInfo.Text = "バージョン情報(&A)...";
             // 
             // splitContainerMain
@@ -221,20 +224,40 @@
             // treeViewFile
             // 
             this.treeViewFile.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeViewFile.ImageIndex = 0;
+            this.treeViewFile.ImageList = this.imageListSmallIcon;
             this.treeViewFile.Location = new System.Drawing.Point(0, 0);
             this.treeViewFile.Name = "treeViewFile";
+            this.treeViewFile.SelectedImageIndex = 0;
             this.treeViewFile.Size = new System.Drawing.Size(266, 426);
             this.treeViewFile.TabIndex = 0;
+            this.treeViewFile.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewFile_AfterSelect);
+            this.treeViewFile.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.treeViewFile_MouseDoubleClick);
+            // 
+            // imageListSmallIcon
+            // 
+            this.imageListSmallIcon.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.imageListSmallIcon.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageListSmallIcon.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // listViewFile
             // 
             this.listViewFile.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listViewFile.HideSelection = false;
+            this.listViewFile.LargeImageList = this.imageListLargeIcon;
             this.listViewFile.Location = new System.Drawing.Point(0, 0);
             this.listViewFile.Name = "listViewFile";
             this.listViewFile.Size = new System.Drawing.Size(530, 426);
+            this.listViewFile.SmallImageList = this.imageListSmallIcon;
             this.listViewFile.TabIndex = 0;
             this.listViewFile.UseCompatibleStateImageBehavior = false;
+            this.listViewFile.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listViewFile_MouseDoubleClick);
+            // 
+            // imageListLargeIcon
+            // 
+            this.imageListLargeIcon.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.imageListLargeIcon.ImageSize = new System.Drawing.Size(32, 32);
+            this.imageListLargeIcon.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // FormMain
             // 
@@ -281,6 +304,8 @@
         private System.Windows.Forms.SplitContainer splitContainerMain;
         private System.Windows.Forms.TreeView treeViewFile;
         private System.Windows.Forms.ListView listViewFile;
+        private System.Windows.Forms.ImageList imageListSmallIcon;
+        private System.Windows.Forms.ImageList imageListLargeIcon;
     }
 }
 
