@@ -53,6 +53,9 @@
             this.imageListSmallIcon = new System.Windows.Forms.ImageList(this.components);
             this.listViewFile = new System.Windows.Forms.ListView();
             this.imageListLargeIcon = new System.Windows.Forms.ImageList(this.components);
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.toolStripMenuItemView = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripComboBoxViewStyle = new System.Windows.Forms.ToolStripComboBox();
             this.menuStripMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
@@ -64,12 +67,13 @@
             // 
             this.menuStripMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemFile,
+            this.toolStripMenuItemView,
             this.toolStripMenuItemEdit,
             this.toolStripMenuItemTool,
             this.toolStripMenuItemHelp});
             this.menuStripMain.Location = new System.Drawing.Point(0, 0);
             this.menuStripMain.Name = "menuStripMain";
-            this.menuStripMain.Size = new System.Drawing.Size(800, 24);
+            this.menuStripMain.Size = new System.Drawing.Size(474, 24);
             this.menuStripMain.TabIndex = 0;
             this.menuStripMain.Text = "menuStripMain";
             // 
@@ -94,11 +98,13 @@
             this.toolStripMenuItemFileOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.toolStripMenuItemFileOpen.Size = new System.Drawing.Size(184, 22);
             this.toolStripMenuItemFileOpen.Text = "開く(&O)";
+            this.toolStripMenuItemFileOpen.Click += new System.EventHandler(this.toolStripMenuItemFileOpen_Click);
             // 
             // toolStripSeparator
             // 
             this.toolStripSeparator.Name = "toolStripSeparator";
             this.toolStripSeparator.Size = new System.Drawing.Size(181, 6);
+            this.toolStripSeparator.Visible = false;
             // 
             // toolStripMenuItemFileOverwrite
             // 
@@ -108,12 +114,14 @@
             this.toolStripMenuItemFileOverwrite.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.toolStripMenuItemFileOverwrite.Size = new System.Drawing.Size(184, 22);
             this.toolStripMenuItemFileOverwrite.Text = "上書き保存(&S)";
+            this.toolStripMenuItemFileOverwrite.Visible = false;
             // 
             // toolStripMenuItemFileSaveAs
             // 
             this.toolStripMenuItemFileSaveAs.Name = "toolStripMenuItemFileSaveAs";
             this.toolStripMenuItemFileSaveAs.Size = new System.Drawing.Size(184, 22);
             this.toolStripMenuItemFileSaveAs.Text = "名前を付けて保存(&A)";
+            this.toolStripMenuItemFileSaveAs.Visible = false;
             // 
             // toolStripSeparator1
             // 
@@ -125,6 +133,7 @@
             this.toolStripMenuItemFileExit.Name = "toolStripMenuItemFileExit";
             this.toolStripMenuItemFileExit.Size = new System.Drawing.Size(184, 22);
             this.toolStripMenuItemFileExit.Text = "終了(&X)";
+            this.toolStripMenuItemFileExit.Click += new System.EventHandler(this.toolStripMenuItemFileExit_Click);
             // 
             // toolStripMenuItemEdit
             // 
@@ -144,8 +153,9 @@
             this.toolStripMenuItemEditCut.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripMenuItemEditCut.Name = "toolStripMenuItemEditCut";
             this.toolStripMenuItemEditCut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.toolStripMenuItemEditCut.Size = new System.Drawing.Size(170, 22);
+            this.toolStripMenuItemEditCut.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemEditCut.Text = "切り取り(&T)";
+            this.toolStripMenuItemEditCut.Visible = false;
             // 
             // toolStripMenuItemEditCopy
             // 
@@ -153,8 +163,9 @@
             this.toolStripMenuItemEditCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripMenuItemEditCopy.Name = "toolStripMenuItemEditCopy";
             this.toolStripMenuItemEditCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.toolStripMenuItemEditCopy.Size = new System.Drawing.Size(170, 22);
+            this.toolStripMenuItemEditCopy.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemEditCopy.Text = "コピー(&C)";
+            this.toolStripMenuItemEditCopy.Click += new System.EventHandler(this.toolStripMenuItemEditCopy_Click);
             // 
             // toolStripMenuItemEditPaste
             // 
@@ -162,19 +173,21 @@
             this.toolStripMenuItemEditPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripMenuItemEditPaste.Name = "toolStripMenuItemEditPaste";
             this.toolStripMenuItemEditPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.toolStripMenuItemEditPaste.Size = new System.Drawing.Size(170, 22);
+            this.toolStripMenuItemEditPaste.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemEditPaste.Text = "貼り付け(&P)";
+            this.toolStripMenuItemEditPaste.Visible = false;
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(167, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
             // 
             // toolStripMenuItemEditSelectAll
             // 
             this.toolStripMenuItemEditSelectAll.Name = "toolStripMenuItemEditSelectAll";
-            this.toolStripMenuItemEditSelectAll.Size = new System.Drawing.Size(170, 22);
+            this.toolStripMenuItemEditSelectAll.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemEditSelectAll.Text = "すべて選択(&A)";
+            this.toolStripMenuItemEditSelectAll.Click += new System.EventHandler(this.toolStripMenuItemEditSelectAll_Click);
             // 
             // toolStripMenuItemTool
             // 
@@ -187,8 +200,9 @@
             // toolStripMenuItemToolOption
             // 
             this.toolStripMenuItemToolOption.Name = "toolStripMenuItemToolOption";
-            this.toolStripMenuItemToolOption.Size = new System.Drawing.Size(135, 22);
+            this.toolStripMenuItemToolOption.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemToolOption.Text = "オプション(&O)";
+            this.toolStripMenuItemToolOption.Click += new System.EventHandler(this.toolStripMenuItemToolOption_Click);
             // 
             // toolStripMenuItemHelp
             // 
@@ -201,8 +215,9 @@
             // toolStripMenuItemHelpVersionInfo
             // 
             this.toolStripMenuItemHelpVersionInfo.Name = "toolStripMenuItemHelpVersionInfo";
-            this.toolStripMenuItemHelpVersionInfo.Size = new System.Drawing.Size(167, 22);
+            this.toolStripMenuItemHelpVersionInfo.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemHelpVersionInfo.Text = "バージョン情報(&A)...";
+            this.toolStripMenuItemHelpVersionInfo.Click += new System.EventHandler(this.toolStripMenuItemHelpVersionInfo_Click);
             // 
             // splitContainerMain
             // 
@@ -217,8 +232,8 @@
             // splitContainerMain.Panel2
             // 
             this.splitContainerMain.Panel2.Controls.Add(this.listViewFile);
-            this.splitContainerMain.Size = new System.Drawing.Size(800, 426);
-            this.splitContainerMain.SplitterDistance = 266;
+            this.splitContainerMain.Size = new System.Drawing.Size(474, 407);
+            this.splitContainerMain.SplitterDistance = 157;
             this.splitContainerMain.TabIndex = 1;
             // 
             // treeViewFile
@@ -229,7 +244,7 @@
             this.treeViewFile.Location = new System.Drawing.Point(0, 0);
             this.treeViewFile.Name = "treeViewFile";
             this.treeViewFile.SelectedImageIndex = 0;
-            this.treeViewFile.Size = new System.Drawing.Size(266, 426);
+            this.treeViewFile.Size = new System.Drawing.Size(157, 407);
             this.treeViewFile.TabIndex = 0;
             this.treeViewFile.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewFile_AfterSelect);
             this.treeViewFile.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.treeViewFile_MouseDoubleClick);
@@ -247,7 +262,7 @@
             this.listViewFile.LargeImageList = this.imageListLargeIcon;
             this.listViewFile.Location = new System.Drawing.Point(0, 0);
             this.listViewFile.Name = "listViewFile";
-            this.listViewFile.Size = new System.Drawing.Size(530, 426);
+            this.listViewFile.Size = new System.Drawing.Size(313, 407);
             this.listViewFile.SmallImageList = this.imageListSmallIcon;
             this.listViewFile.TabIndex = 0;
             this.listViewFile.UseCompatibleStateImageBehavior = false;
@@ -259,17 +274,38 @@
             this.imageListLargeIcon.ImageSize = new System.Drawing.Size(32, 32);
             this.imageListLargeIcon.TransparentColor = System.Drawing.Color.Transparent;
             // 
+            // openFileDialog
+            // 
+            this.openFileDialog.RestoreDirectory = true;
+            // 
+            // toolStripMenuItemView
+            // 
+            this.toolStripMenuItemView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripComboBoxViewStyle});
+            this.toolStripMenuItemView.Name = "toolStripMenuItemView";
+            this.toolStripMenuItemView.Size = new System.Drawing.Size(58, 20);
+            this.toolStripMenuItemView.Text = "表示(&V)";
+            // 
+            // toolStripComboBoxViewStyle
+            // 
+            this.toolStripComboBoxViewStyle.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.toolStripComboBoxViewStyle.Name = "toolStripComboBoxViewStyle";
+            this.toolStripComboBoxViewStyle.Size = new System.Drawing.Size(121, 23);
+            this.toolStripComboBoxViewStyle.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBoxViewStyle_SelectedIndexChanged);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(474, 431);
             this.Controls.Add(this.splitContainerMain);
             this.Controls.Add(this.menuStripMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStripMain;
             this.Name = "FormMain";
             this.Text = "ファイルビューア";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
+            this.Load += new System.EventHandler(this.FormMain_Load);
             this.menuStripMain.ResumeLayout(false);
             this.menuStripMain.PerformLayout();
             this.splitContainerMain.Panel1.ResumeLayout(false);
@@ -306,6 +342,9 @@
         private System.Windows.Forms.ListView listViewFile;
         private System.Windows.Forms.ImageList imageListSmallIcon;
         private System.Windows.Forms.ImageList imageListLargeIcon;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemView;
+        private System.Windows.Forms.ToolStripComboBox toolStripComboBoxViewStyle;
     }
 }
 
