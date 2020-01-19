@@ -49,6 +49,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Decompressor\IDecompressor.cs" />
+    <Compile Include="Decompressor\WorkerProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Decompressor\WorkerProgressForm.Designer.cs">
+      <DependentUpon>WorkerProgressForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Decompressor\ZipDecompressor.cs" />
     <Compile Include="FileManager.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
@@ -58,6 +66,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Decompressor\WorkerProgressForm.resx">
+      <DependentUpon>WorkerProgressForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>

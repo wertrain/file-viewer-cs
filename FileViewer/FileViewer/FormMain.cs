@@ -13,6 +13,11 @@ namespace FileViewer
 {
     public partial class FormMain : Form
     {
+        /// <summary>
+        /// 解凍先のディレクトリ
+        /// </summary>
+        private string DecompressedDirectoryPath{ get; set; }
+
         class ComboBoxItem
         {
             private string Text { get; set; }
@@ -30,18 +35,50 @@ namespace FileViewer
             }
         }
 
-        public FormMain()
+        ///
+        public FormMain(string path)
         {
             InitializeComponent();
 
-            Open(@"D:\Develop\C#\file-viewer-cs\FileViewer\FileViewer");
+            InitializeViews();
+
+            DecompressAndOpen(path);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private bool DecompressAndOpen(string path)
+        {
+            using (var worker = new Decompressor.WorkerProgressForm())
+            {
+                var decompressor = new Decompressor.ZipDecompressor(@"..\..\Tool\TinyUnzipper.exe");
+
+                DecompressedDirectoryPath = FileManager.GetTempDirectory();
+                worker.Decompress(decompressor, path, DecompressedDirectoryPath);
+
+                if (worker.ShowDialog(this) == DialogResult.OK)
+                {
+                    var openDirectoryPath = DecompressedDirectoryPath + Path.GetFileNameWithoutExtension(path);
+                    if (!Directory.Exists(openDirectoryPath)) openDirectoryPath = DecompressedDirectoryPath;
+                    return Open(openDirectoryPath);
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// ビューア対象のパスを指定する
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private bool Open(string path)
         {
             listViewFile.View = View.LargeIcon;
 
-            CreateNode(path, treeViewFile.Nodes);
+            CreateNodeTree(path, treeViewFile.Nodes);
             SetCurrentNode(treeViewFile.Nodes);
 
             treeViewFile.ExpandAll();
@@ -49,23 +86,31 @@ namespace FileViewer
             return true;
         }
 
+        /// <summary>
+        /// ノード指定してリストビューを作成する
+        /// </summary>
+        /// <param name="nodes"></param>
         private void SetCurrentNode(TreeNodeCollection nodes)
         {
             listViewFile.Items.Clear();
 
             foreach (TreeNode node in nodes)
             {
-                var fullPath = (string)node.Tag;
+                var fileInfo = (FileManager.Info)node.Tag;
 
                 ListViewItem item;
-                if (Directory.Exists(fullPath))
+                if (Directory.Exists(fileInfo.FilePath))
                 {
                     item = new ListViewItem(node.Text);
                 }
                 else
                 {
-                    FileInfo info = new FileInfo(fullPath);
-                    item = new ListViewItem(new string[] { node.Text, FileManager.BytesToString(info.Length), info.LastWriteTime.ToString() });
+                    item = new ListViewItem(new string[] {
+                        node.Text,
+                        FileManager.BytesToString(fileInfo.FileType.Length),
+                        fileInfo.FileType,
+                        fileInfo.FileInfo.LastWriteTime.ToString()
+                    });
                 }
                 item.ImageIndex = node.ImageIndex;
                 item.Tag = node;
@@ -73,33 +118,42 @@ namespace FileViewer
             }
         }
 
-        private void CreateNode(string path, TreeNodeCollection nodes)
+        /// <summary>
+        /// 指定されたファイルパスからノードツリーを作成する
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="nodes"></param>
+        private void CreateNodeTree(string path, TreeNodeCollection nodes)
         {
             var index = imageListLargeIcon.Images.Count;
-            var licon = FileManager.IconUtility.GetIconImage(path, true);
-            var sicon = FileManager.IconUtility.GetIconImage(path, false);
-            imageListLargeIcon.Images.Add(licon);
-            imageListSmallIcon.Images.Add(sicon);
+            FileManager.Info fileInfo = FileManager.GetFileInfo(path);
+            imageListLargeIcon.Images.Add(fileInfo.LargeIcon);
+            imageListSmallIcon.Images.Add(fileInfo.SmallIcon);
 
             var node = new TreeNode(Path.GetFileName(path));
             node.ImageIndex = node.SelectedImageIndex = index;
-            node.Tag = path;
+            node.Tag = fileInfo;
             nodes.Add(node);
 
             if (Directory.Exists(path))
             {
                 foreach (var entry in Directory.GetDirectories(path, "*"))
                 {
-                    CreateNode(entry, node.Nodes);
+                    CreateNodeTree(entry, node.Nodes);
                 }
 
                 foreach (var entry in Directory.GetFiles(path, "*"))
                 {
-                    CreateNode(entry, node.Nodes);
+                    CreateNodeTree(entry, node.Nodes);
                 }
             }
         }
 
+        /// <summary>
+        /// 選択中の最初のノードを取得する
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <returns></returns>
         private TreeNode GetSelectedNode(TreeNodeCollection nodes)
         {
             foreach (TreeNode node in nodes)
@@ -119,19 +173,10 @@ namespace FileViewer
             return null;
         }
 
-        private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (this.WindowState == FormWindowState.Normal)
-            {
-                Properties.Settings.Default.WindowSize = Size;
-            }
-            Properties.Settings.Default.SplitterDistance = splitContainerMain.SplitterDistance;
-            Properties.Settings.Default.ViewStyleIndex = toolStripComboBoxViewStyle.SelectedIndex;
-
-            Properties.Settings.Default.Save();
-        }
-
-        private void FormMain_Load(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        private void InitializeViews()
         {
             toolStripComboBoxViewStyle.Items.Add(new ComboBoxItem("大アイコン", View.LargeIcon));
             toolStripComboBoxViewStyle.Items.Add(new ComboBoxItem("小アイコン", View.SmallIcon));
@@ -145,12 +190,23 @@ namespace FileViewer
             var columnFileSize = new ColumnHeader();
             columnFileSize.Text = "サイズ";
             columnFileSize.Width = 70;
+            var columnFileType = new ColumnHeader();
+            columnFileType.Text = "ファイルタイプ";
+            columnFileType.Width = 90;
             var columnLastWriteTime = new ColumnHeader();
             columnLastWriteTime.Text = "更新日時";
             columnLastWriteTime.Width = 120;
-            ColumnHeader[] colHeaderRegValue = { columnFileName, columnFileSize, columnLastWriteTime };
+            ColumnHeader[] colHeaderRegValue = { columnFileName, columnFileSize, columnFileType, columnLastWriteTime };
             listViewFile.Columns.AddRange(colHeaderRegValue);
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FormMain_Load(object sender, EventArgs e)
+        {
             if (Properties.Settings.Default.WindowSize.Width > 0 && Properties.Settings.Default.WindowSize.Height > 0)
             {
                 Size = Properties.Settings.Default.WindowSize;
@@ -162,16 +218,50 @@ namespace FileViewer
             listViewFile.View = item.View;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FileManager.Delete(DecompressedDirectoryPath);
+
+            if (this.WindowState == FormWindowState.Normal)
+            {
+                Properties.Settings.Default.WindowSize = Size;
+            }
+            Properties.Settings.Default.SplitterDistance = splitContainerMain.SplitterDistance;
+            Properties.Settings.Default.ViewStyleIndex = toolStripComboBoxViewStyle.SelectedIndex;
+
+            Properties.Settings.Default.Save();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void treeViewFile_AfterSelect(object sender, TreeViewEventArgs e)
         {
             TreeNode node = GetSelectedNode(((TreeView)sender).Nodes);
 
             if (node != null)
             {
-                SetCurrentNode(node.Nodes);
+                var fileInfo = (FileManager.Info)node.Tag;
+
+                if (Directory.Exists(fileInfo.FilePath))
+                {
+                    SetCurrentNode(node.Nodes);
+                }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void listViewFile_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             var clickedItem = ((ListView)sender).HitTest(e.Location).Item;
@@ -179,9 +269,9 @@ namespace FileViewer
             if (clickedItem != null)
             {
                 var treeNode = (TreeNode)clickedItem.Tag;
-                var fullPath = (string)treeNode.Tag;
+                var fileInfo = (FileManager.Info)treeNode.Tag;
 
-                if (Directory.Exists(fullPath))
+                if (Directory.Exists(fileInfo.FilePath))
                 {
                     SetCurrentNode(treeNode.Nodes);
                 }
@@ -189,26 +279,36 @@ namespace FileViewer
                 {
                     // 関連付けがない場合、例外が投げられる
                     // その場合は単に無視する
-                    try { System.Diagnostics.Process.Start(fullPath); } catch {}
+                    try { System.Diagnostics.Process.Start(fileInfo.FilePath); } catch {}
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void treeViewFile_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             var clickedItem = ((TreeView)sender).HitTest(e.Location).Node;
 
             if (clickedItem != null)
             {
-                var fullPath = (string)clickedItem.Tag;
+                var fileInfo = (FileManager.Info)clickedItem.Tag;
 
-                if (!Directory.Exists(fullPath))
+                if (!Directory.Exists(fileInfo.FilePath))
                 {
-                    try { System.Diagnostics.Process.Start(fullPath); } catch {}
+                    try { System.Diagnostics.Process.Start(fileInfo.FilePath); } catch {}
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripMenuItemFileOpen_Click(object sender, EventArgs e)
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -217,11 +317,21 @@ namespace FileViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripMenuItemFileExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripMenuItemEditCopy_Click(object sender, EventArgs e)
         {
             var files = new System.Collections.Specialized.StringCollection();
@@ -230,7 +340,9 @@ namespace FileViewer
             {
                 if (item.Selected)
                 {
-                    files.Add((string)item.Tag);
+                    var node = (TreeNode)item.Tag;
+                    var fileInfo = (FileManager.Info)node.Tag;
+                    files.Add(fileInfo.FilePath);
                 }
             }
 
@@ -240,6 +352,11 @@ namespace FileViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripMenuItemEditSelectAll_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem item in listViewFile.Items)
@@ -248,21 +365,41 @@ namespace FileViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripMenuItemToolOption_Click(object sender, EventArgs e)
         {
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripMenuItemHelpVersionInfo_Click(object sender, EventArgs e)
         {
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void splitContainerMain_SplitterMoved(object sender, SplitterEventArgs e)
         {
             Properties.Settings.Default.SplitterDistance = ((SplitContainer)sender).SplitterDistance;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripComboBoxViewStyle_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (toolStripComboBoxViewStyle.Selected)
