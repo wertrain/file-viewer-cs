@@ -184,6 +184,21 @@ namespace FileViewer
             toolStripComboBoxViewStyle.Items.Add(new ComboBoxItem("詳細表示", View.Details));
             toolStripComboBoxViewStyle.Items.Add(new ComboBoxItem("タイル", View.Tile));
 
+            // ToolStripMenu の「編集」をそのままコンテキストメニューに
+            var contextMenuStrip = new ContextMenuStrip();
+            var toolStripMenus = new List<ToolStripMenuItem>();
+            foreach (var toolStripMenuItem in toolStripMenuItemEdit.DropDownItems)
+            {
+                if (toolStripMenuItem is ToolStripMenuItem)
+                {
+                    toolStripMenus.Add(toolStripMenuItem as ToolStripMenuItem);
+                }
+            }
+            contextMenuStrip.Items.AddRange(toolStripMenus.ToArray());
+
+            listViewFile.ContextMenuStrip = contextMenuStrip;
+            treeViewFile.ContextMenuStrip = contextMenuStrip;
+
             var columnFileName = new ColumnHeader();
             columnFileName.Text = "名前";
             columnFileName.Width = 180;
@@ -250,10 +265,7 @@ namespace FileViewer
             {
                 var fileInfo = (FileManager.Info)node.Tag;
 
-                if (Directory.Exists(fileInfo.FilePath))
-                {
-                    SetCurrentNode(node.Nodes);
-                }
+                SetCurrentNode(Directory.Exists(fileInfo.FilePath) ? node.Nodes : node.Parent.Nodes);
             }
         }
 
@@ -407,6 +419,39 @@ namespace FileViewer
                 ComboBoxItem item = (ComboBoxItem)toolStripComboBoxViewStyle.Items[toolStripComboBoxViewStyle.SelectedIndex];
                 listViewFile.View = item.View;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listViewFile_ItemDrag(object sender, ItemDragEventArgs e)
+        {
+            var item = e.Item as ListViewItem;
+            var node = item.Tag as TreeNode;
+            var fileInfo = node.Tag as FileManager.Info;
+
+            string[] paths = { fileInfo.FilePath };
+            DataObject dataObj = new DataObject(DataFormats.FileDrop, paths);
+            DragDropEffects effect = DragDropEffects.Copy | DragDropEffects.Move;
+            listViewFile.DoDragDrop(dataObj, effect);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void treeViewFile_ItemDrag(object sender, ItemDragEventArgs e)
+        {
+            var node = e.Item as TreeNode;
+            var fileInfo = node.Tag as FileManager.Info;
+
+            string[] paths = { fileInfo.FilePath };
+            DataObject dataObj = new DataObject(DataFormats.FileDrop, paths);
+            DragDropEffects effect = DragDropEffects.Copy | DragDropEffects.Move;
+            treeViewFile.DoDragDrop(dataObj, effect);
         }
     }
 }
