@@ -9,24 +9,15 @@ namespace FileViewer.Decompressor
 {
     public class ZipDecompressor : IDecompressor
     {
-        private string DecompressorPath { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Extension => ".zip";
 
         /// <summary>
-        /// コンストラクタ（非公開）
+        /// 
         /// </summary>
-        private ZipDecompressor()
-        {
-
-        }
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="toolPath"></param>
-        public ZipDecompressor(string toolPath)
-        {
-            DecompressorPath = toolPath;
-        }
+        public string Name => "ZIPファイル";
 
         /// <summary>
         /// 解凍
@@ -52,5 +43,24 @@ namespace FileViewer.Decompressor
             }
             return false;
         }
+
+        /// <summary>
+        /// コンストラクタ（非公開）
+        /// </summary>
+        private ZipDecompressor()
+        {
+
+        }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="toolPath"></param>
+        public ZipDecompressor(string toolPath)
+        {
+            DecompressorPath = toolPath;
+        }
+
+        private string DecompressorPath { get; set; }
     }
 }
