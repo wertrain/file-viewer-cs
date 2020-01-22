@@ -54,16 +54,26 @@ namespace FileViewer
         {
             using (var worker = new Decompressor.WorkerProgressForm())
             {
-                var decompressor = new Decompressor.ZipDecompressor(@"..\..\Tool\TinyUnzipper.exe");
-
                 DecompressedDirectoryPath = FileManager.GetTempDirectory();
-                worker.Decompress(decompressor, path, DecompressedDirectoryPath);
+                
+                //worker.Decompress(decompressor, path, DecompressedDirectoryPath);
+                var param = new Decompressor.WorkerProgressForm.WorkerParameter();
+                param.Decompressor = new Decompressor.ZipDecompressor(@"..\..\Tool\TinyUnzipper.exe");
+                param.InputFilePath = path;
+                param.OutputDirectoryPath = DecompressedDirectoryPath;
+                worker.Start(param);
 
                 if (worker.ShowDialog(this) == DialogResult.OK)
                 {
-                    var openDirectoryPath = DecompressedDirectoryPath + Path.GetFileNameWithoutExtension(path);
-                    if (!Directory.Exists(openDirectoryPath)) openDirectoryPath = DecompressedDirectoryPath;
-                    return Open(openDirectoryPath);
+                    imageListLargeIcon.Images.AddRange(worker.Result.LargeIconList.ToArray());
+                    imageListSmallIcon.Images.AddRange(worker.Result.SmallIconList.ToArray());
+                    treeViewFile.Nodes.Add(worker.Result.RootNode.FirstNode);
+                    SetCurrentNode(treeViewFile.Nodes);
+                    treeViewFile.ExpandAll();
+
+                    //var openDirectoryPath = DecompressedDirectoryPath + Path.GetFileNameWithoutExtension(path);
+                    //if (!Directory.Exists(openDirectoryPath)) openDirectoryPath = DecompressedDirectoryPath;
+                    //return Open(openDirectoryPath);
                 }
             }
             return false;
