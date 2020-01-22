@@ -191,7 +191,19 @@ namespace FileViewer
             {
                 if (toolStripMenuItem is ToolStripMenuItem)
                 {
-                    toolStripMenus.Add(toolStripMenuItem as ToolStripMenuItem);
+                    var dstItem = toolStripMenuItem as ToolStripMenuItem;
+                    if (!dstItem.Available) continue;
+
+                    var newItem = new ToolStripMenuItem(dstItem.Text, dstItem.Image);
+
+                    // ハック的なイベントのコピー
+                    // https://stackoverflow.com/questions/6055038/how-to-clone-control-event-handlers-at-run-time
+                    var eventsField = typeof(Component).GetField("events",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var eventHandlerList = eventsField.GetValue(dstItem);
+                    eventsField.SetValue(newItem, eventHandlerList);
+
+                    toolStripMenus.Add(newItem);
                 }
             }
             contextMenuStrip.Items.AddRange(toolStripMenus.ToArray());
@@ -428,13 +440,18 @@ namespace FileViewer
         /// <param name="e"></param>
         private void listViewFile_ItemDrag(object sender, ItemDragEventArgs e)
         {
-            var item = e.Item as ListViewItem;
-            var node = item.Tag as TreeNode;
-            var fileInfo = node.Tag as FileManager.Info;
+            var listView = sender as ListView;
+            var paths = new List<string>();
 
-            string[] paths = { fileInfo.FilePath };
-            DataObject dataObj = new DataObject(DataFormats.FileDrop, paths);
-            DragDropEffects effect = DragDropEffects.Copy | DragDropEffects.Move;
+            foreach (var item in listView.SelectedItems.Cast<ListViewItem>())
+            {
+                var node = item.Tag as TreeNode;
+                var fileInfo = node.Tag as FileManager.Info;
+                paths.Add(fileInfo.FilePath);
+            }
+
+            DataObject dataObj = new DataObject(DataFormats.FileDrop, paths.ToArray());
+            DragDropEffects effect = DragDropEffects.Copy;
             listViewFile.DoDragDrop(dataObj, effect);
         }
 
