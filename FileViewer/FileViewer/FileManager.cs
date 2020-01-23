@@ -33,6 +33,7 @@ namespace FileViewer
         private const uint SHGFI_SMALLICON = 0x000000001;
         private const uint SHGFI_USEFILEATTRIBUTES = 0x10;
         private const uint SHGFI_TYPENAME = 0x400;
+        private const uint FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
 
         /// <summary>
         /// ファイル情報
@@ -46,8 +47,15 @@ namespace FileViewer
             public FileInfo FileInfo { get; set; }
         }
 
+        /// <summary>
+        /// 一時ディレクトリを作成して取得する
+        /// </summary>
+        /// <returns></returns>
         public static string GetTempDirectory()
         {
+#if DEBUG
+            return string.Empty;
+#else
             var name = Path.GetTempPath() + Guid.NewGuid().ToString() + Path.DirectorySeparatorChar;
             try
             {
@@ -58,6 +66,7 @@ namespace FileViewer
                 return string.Empty;
             }
             return name;
+#endif
         }
 
         /// <summary>
@@ -67,6 +76,9 @@ namespace FileViewer
         /// <returns></returns>
         public static bool Delete(string path)
         {
+#if DEBUG
+            return false;
+#else
             try
             {
                 if (Directory.Exists(path))
@@ -84,6 +96,7 @@ namespace FileViewer
             }
 
             return true;
+#endif
         }
 
         /// <summary>
@@ -101,7 +114,7 @@ namespace FileViewer
                 SHGetFileInfo(
                     filePath,
                     0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
-                    SHGFI_USEFILEATTRIBUTES | SHGFI_TYPENAME |
+                    SHGFI_TYPENAME |
                     SHGFI_ICON | SHGFI_LARGEICON);
 
                 if (shinfo.hIcon == IntPtr.Zero)
@@ -110,7 +123,7 @@ namespace FileViewer
                 }
                 else
                 {
-                    fileInfo.LargeIcon = IconToImage(Icon.FromHandle(shinfo.hIcon));
+                    fileInfo.LargeIcon = (Image)IconToImage(Icon.FromHandle(shinfo.hIcon));
                     DestroyIcon(shinfo.hIcon);
                 }
                 fileInfo.FileType = shinfo.szTypeName;
@@ -170,6 +183,27 @@ namespace FileViewer
                 len = len / 1024;
             }
             return string.Format("{0:0.##} {1}", len, sizes[order]);
+        }
+
+        /// <summary>
+        /// アイコンからハッシュを計算する
+        /// </summary>
+        /// <param name="icon"></param>
+        /// <returns></returns>
+        public static string ComputeIconHash(Image image)
+        {
+            ImageConverter converter = new ImageConverter();
+            byte[] rawIcon = converter.ConvertTo(image, typeof(byte[])) as byte[];
+
+            var md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            byte[] hash = md5.ComputeHash(rawIcon);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (var h in hash)
+            {
+                stringBuilder.Append(h.ToString("X2"));
+            }
+            return stringBuilder.ToString();
         }
     }
 }
