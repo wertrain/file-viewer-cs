@@ -48,8 +48,17 @@ namespace FileViewer.Decompressor
         {
             var index = largeIconList.Count;
             FileManager.Info fileInfo = FileManager.GetFileInfo(path);
-            largeIconList.Add(fileInfo.LargeIcon);
-            smallIconList.Add(fileInfo.SmallIcon);
+
+            var key = FileManager.ComputeIconHash(fileInfo.SmallIcon);
+
+            if (IconCacheDictionary.ContainsKey(key))
+                index = IconCacheDictionary[key];
+            else
+            {
+                IconCacheDictionary.Add(key, index);
+                largeIconList.Add(fileInfo.LargeIcon);
+                smallIconList.Add(fileInfo.SmallIcon);
+            }
 
             var node = new TreeNode(Path.GetFileName(path));
             node.ImageIndex = node.SelectedImageIndex = index;
@@ -81,6 +90,8 @@ namespace FileViewer.Decompressor
         public WorkerProgressForm()
         {
             InitializeComponent();
+
+            IconCacheDictionary = new Dictionary<string, int>();
         }
 
         /// <summary>
@@ -137,6 +148,7 @@ namespace FileViewer.Decompressor
                     {
                         CreateNodes(entry, result.LargeIconList, result.SmallIconList, result.RootNode.Nodes);
                     }
+
                     e.Result = result;
                 }
             }
@@ -189,5 +201,10 @@ namespace FileViewer.Decompressor
                 backgroundWorker.CancelAsync();
             }
         }
+
+        /// <summary>
+        /// アイコンキャッシュのための辞書
+        /// </summary>
+        private Dictionary<string, int> IconCacheDictionary { get; set; }
     }
 }
