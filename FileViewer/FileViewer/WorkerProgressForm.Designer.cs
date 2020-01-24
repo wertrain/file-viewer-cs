@@ -1,4 +1,4 @@
-﻿namespace FileViewer.Decompressor
+﻿namespace FileViewer
 {
     partial class WorkerProgressForm
     {

@@ -9,13 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FileViewer.Decompressor
+namespace FileViewer
 {
     public partial class WorkerProgressForm : Form
     {
         public class WorkerParameter
         {
-            public IDecompressor Decompressor { get; set; }
+            public Decompressor.IDecompressor Decompressor { get; set; }
 
             public string InputFilePath { get; set; }
             public string OutputDirectoryPath { get; set; }
@@ -82,7 +82,7 @@ namespace FileViewer.Decompressor
         /// <summary>
         /// 
         /// </summary>
-        private IDecompressor Decompressor { get; set; }
+        private Decompressor.IDecompressor Decompressor { get; set; }
 
         /// <summary>
         /// コンストラクタ
@@ -92,34 +92,6 @@ namespace FileViewer.Decompressor
             InitializeComponent();
 
             IconCacheDictionary = new Dictionary<string, int>();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="decompressor"></param>
-        /// <param name="srcFilePath"></param>
-        /// <param name="dstDirectoryPath"></param>
-        /// <returns></returns>
-        public bool Decompress(IDecompressor decompressor, string srcFilePath, string dstDirectoryPath)
-        {
-            Decompressor = decompressor;
-
-            try
-            {
-                var args = new List<string>
-                {
-                    srcFilePath,
-                    dstDirectoryPath
-                };
-                backgroundWorker.RunWorkerAsync(args);
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>

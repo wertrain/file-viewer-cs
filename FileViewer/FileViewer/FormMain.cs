@@ -52,23 +52,27 @@ namespace FileViewer
         /// <returns></returns>
         private bool DecompressAndOpen(string path)
         {
-            using (var worker = new Decompressor.WorkerProgressForm())
+            using (var worker = new WorkerProgressForm())
             {
                 DecompressedDirectoryPath = FileManager.GetTempDirectory();
                 
                 //worker.Decompress(decompressor, path, DecompressedDirectoryPath);
-                var param = new Decompressor.WorkerProgressForm.WorkerParameter();
-                param.Decompressor = new Decompressor.ZipDecompressor(@"..\..\Tool\TinyUnzipper.exe");
+                var param = new WorkerProgressForm.WorkerParameter();
+                param.Decompressor = new Decompressor.ZipDecompressor();
                 param.InputFilePath = path;
                 param.OutputDirectoryPath = DecompressedDirectoryPath;
                 worker.Start(param);
 
                 if (worker.ShowDialog(this) == DialogResult.OK)
                 {
-                    imageListLargeIcon.Images.AddRange(worker.Result.LargeIconList.ToArray());
-                    imageListSmallIcon.Images.AddRange(worker.Result.SmallIconList.ToArray());
-                    treeViewFile.Nodes.Add(worker.Result.RootNode.FirstNode);
+                    var result = worker.Result;
+
+                    imageListLargeIcon.Images.AddRange(result.LargeIconList.ToArray());
+                    imageListSmallIcon.Images.AddRange(result.SmallIconList.ToArray());
+                    treeViewFile.Nodes.Add(result.RootNode.FirstNode);
+
                     SetCurrentNode(treeViewFile.Nodes);
+
                     treeViewFile.ExpandAll();
 
                     //var openDirectoryPath = DecompressedDirectoryPath + Path.GetFileNameWithoutExtension(path);
@@ -262,7 +266,7 @@ namespace FileViewer
         /// <param name="e"></param>
         private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
         {
-            FileManager.Delete(DecompressedDirectoryPath);
+            //FileManager.Delete(DecompressedDirectoryPath);
 
             if (this.WindowState == FormWindowState.Normal)
             {

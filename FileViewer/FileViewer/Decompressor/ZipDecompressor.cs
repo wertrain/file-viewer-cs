@@ -10,12 +10,12 @@ namespace FileViewer.Decompressor
     public class ZipDecompressor : IDecompressor
     {
         /// <summary>
-        /// 
+        /// 解凍できるファイルの拡張子
         /// </summary>
         public string Extension => ".zip";
 
         /// <summary>
-        /// 
+        /// 解凍できるファイル種類名
         /// </summary>
         public string Name => "ZIPファイル";
 
@@ -27,40 +27,10 @@ namespace FileViewer.Decompressor
         /// <returns></returns>
         public bool Decompress(string srcFilePath, string dstDirectoryPath)
         {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = DecompressorPath,
-                    Arguments = srcFilePath + " " + dstDirectoryPath,
-                    UseShellExecute = false
-                }
-            };
-            if (process.Start())
-            {
-                process.WaitForExit();
-                return true;
-            }
-            return false;
+            return DecompressProcess.Start(
+                @"..\..\Tool\TinyUnzipper.exe",
+                new List<string> { srcFilePath, dstDirectoryPath }
+            );
         }
-
-        /// <summary>
-        /// コンストラクタ（非公開）
-        /// </summary>
-        private ZipDecompressor()
-        {
-
-        }
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="toolPath"></param>
-        public ZipDecompressor(string toolPath)
-        {
-            DecompressorPath = toolPath;
-        }
-
-        private string DecompressorPath { get; set; }
     }
 }

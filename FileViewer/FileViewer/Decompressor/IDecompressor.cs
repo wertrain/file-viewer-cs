@@ -30,4 +30,35 @@ namespace FileViewer.Decompressor
         /// </summary>
         string Name { get; }
     }
+
+    /// <summary>
+    /// プロセス実行ユーティリティ
+    /// </summary>
+    public class DecompressProcess
+    {
+        /// <summary>
+        /// プロセスを実行
+        /// </summary>
+        /// <param name="fileName">実行するファイル名</param>
+        /// <param name="args">引数のリスト（半角スペースで連結）</param>
+        /// <returns></returns>
+        public static bool Start(string fileName, List<string> args)
+        {
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = string.Join(" ", args),
+                    UseShellExecute = false
+                }
+            };
+            if (process.Start())
+            {
+                process.WaitForExit();
+                return true;
+            }
+            return false;
+        }
+    }
 }
