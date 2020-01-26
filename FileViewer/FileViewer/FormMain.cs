@@ -16,8 +16,16 @@ namespace FileViewer
         /// <summary>
         /// 解凍先のディレクトリ
         /// </summary>
-        private string DecompressedDirectoryPath{ get; set; }
+        private string _decompressedDirectoryPath;
 
+        /// <summary>
+        /// 解凍制御クラスのインスタンス
+        /// </summary>
+        private Decompressor.IDecompressor _decompressor = new Decompressor.ZipDecompressor();
+
+        /// <summary>
+        /// 
+        /// </summary>
         class ComboBoxItem
         {
             private string Text { get; set; }
@@ -35,7 +43,10 @@ namespace FileViewer
             }
         }
 
-        ///
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="path"></param>
         public FormMain(string path)
         {
             InitializeComponent();
@@ -54,13 +65,12 @@ namespace FileViewer
         {
             using (var worker = new WorkerProgressForm())
             {
-                DecompressedDirectoryPath = FileManager.GetTempDirectory();
+                _decompressedDirectoryPath = FileManager.GetTempDirectory();
                 
-                //worker.Decompress(decompressor, path, DecompressedDirectoryPath);
                 var param = new WorkerProgressForm.WorkerParameter();
-                param.Decompressor = new Decompressor.ZipDecompressor();
+                param.Decompressor = _decompressor;
                 param.InputFilePath = path;
-                param.OutputDirectoryPath = DecompressedDirectoryPath;
+                param.OutputDirectoryPath = _decompressedDirectoryPath;
                 worker.Start(param);
 
                 if (worker.ShowDialog(this) == DialogResult.OK)
@@ -74,30 +84,9 @@ namespace FileViewer
                     SetCurrentNode(treeViewFile.Nodes);
 
                     treeViewFile.ExpandAll();
-
-                    //var openDirectoryPath = DecompressedDirectoryPath + Path.GetFileNameWithoutExtension(path);
-                    //if (!Directory.Exists(openDirectoryPath)) openDirectoryPath = DecompressedDirectoryPath;
-                    //return Open(openDirectoryPath);
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// ビューア対象のパスを指定する
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        private bool Open(string path)
-        {
-            listViewFile.View = View.LargeIcon;
-
-            CreateNodeTree(path, treeViewFile.Nodes);
-            SetCurrentNode(treeViewFile.Nodes);
-
-            treeViewFile.ExpandAll();
-
-            return true;
         }
 
         /// <summary>
@@ -129,37 +118,6 @@ namespace FileViewer
                 item.ImageIndex = node.ImageIndex;
                 item.Tag = node;
                 listViewFile.Items.Add(item);
-            }
-        }
-
-        /// <summary>
-        /// 指定されたファイルパスからノードツリーを作成する
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="nodes"></param>
-        private void CreateNodeTree(string path, TreeNodeCollection nodes)
-        {
-            var index = imageListLargeIcon.Images.Count;
-            FileManager.Info fileInfo = FileManager.GetFileInfo(path);
-            imageListLargeIcon.Images.Add(fileInfo.LargeIcon);
-            imageListSmallIcon.Images.Add(fileInfo.SmallIcon);
-
-            var node = new TreeNode(Path.GetFileName(path));
-            node.ImageIndex = node.SelectedImageIndex = index;
-            node.Tag = fileInfo;
-            nodes.Add(node);
-
-            if (Directory.Exists(path))
-            {
-                foreach (var entry in Directory.GetDirectories(path, "*"))
-                {
-                    CreateNodeTree(entry, node.Nodes);
-                }
-
-                foreach (var entry in Directory.GetFiles(path, "*"))
-                {
-                    CreateNodeTree(entry, node.Nodes);
-                }
             }
         }
 
@@ -349,9 +307,16 @@ namespace FileViewer
         /// <param name="e"></param>
         private void toolStripMenuItemFileOpen_Click(object sender, EventArgs e)
         {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(_decompressor.Name);
+            sb.Append("|");
+            sb.Append("*");
+            sb.Append(_decompressor.Extension);
+
+            openFileDialog.Filter = sb.ToString();
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                Open(openFileDialog.FileName);
+                DecompressAndOpen(openFileDialog.FileName);
             }
         }
 

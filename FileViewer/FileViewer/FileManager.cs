@@ -53,9 +53,6 @@ namespace FileViewer
         /// <returns></returns>
         public static string GetTempDirectory()
         {
-#if DEBUG
-            return string.Empty;
-#else
             var name = Path.GetTempPath() + Guid.NewGuid().ToString() + Path.DirectorySeparatorChar;
             try
             {
@@ -66,7 +63,6 @@ namespace FileViewer
                 return string.Empty;
             }
             return name;
-#endif
         }
 
         /// <summary>
@@ -76,9 +72,6 @@ namespace FileViewer
         /// <returns></returns>
         public static bool Delete(string path)
         {
-#if DEBUG
-            return false;
-#else
             try
             {
                 if (Directory.Exists(path))
@@ -96,7 +89,6 @@ namespace FileViewer
             }
 
             return true;
-#endif
         }
 
         /// <summary>

@@ -121,7 +121,10 @@ namespace FileViewer
                         CreateNodes(entry, result.LargeIconList, result.SmallIconList, result.RootNode.Nodes);
                     }
 
-                    e.Result = result;
+                    if (result.RootNode.Nodes.Count > 0)
+                    {
+                        e.Result = result;
+                    }
                 }
             }
         }
