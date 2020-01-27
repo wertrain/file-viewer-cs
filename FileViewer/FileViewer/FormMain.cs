@@ -224,7 +224,7 @@ namespace FileViewer
         /// <param name="e"></param>
         private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
         {
-            //FileManager.Delete(DecompressedDirectoryPath);
+            FileManager.Delete(_decompressedDirectoryPath);
 
             if (this.WindowState == FormWindowState.Normal)
             {
