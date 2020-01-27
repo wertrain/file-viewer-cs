@@ -66,6 +66,27 @@ namespace FileViewer
         }
 
         /// <summary>
+        /// ディレクトリを削除
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool DeleteTempDirectory(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+
+            if (!path.StartsWith(Path.GetTempPath()))
+            {
+                return false;
+            }
+
+            return Delete(path);
+        }
+
+
+        /// <summary>
         /// ファイル・ディレクトリを削除
         /// </summary>
         /// <param name="path"></param>

@@ -13,6 +13,9 @@ namespace FileViewer
 {
     public partial class WorkerProgressForm : Form
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public class WorkerParameter
         {
             public Decompressor.IDecompressor Decompressor { get; set; }
@@ -21,6 +24,9 @@ namespace FileViewer
             public string OutputDirectoryPath { get; set; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public class WorkerResult
         {
             public TreeNode RootNode { get; set; }
@@ -28,8 +34,16 @@ namespace FileViewer
             public List<Image> SmallIconList { get; set; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public WorkerResult Result { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public bool Start(WorkerParameter param)
         {
             try
@@ -44,6 +58,13 @@ namespace FileViewer
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="largeIconList"></param>
+        /// <param name="smallIconList"></param>
+        /// <param name="nodes"></param>
         public void CreateNodes(string path, List<Image> largeIconList, List<Image> smallIconList, TreeNodeCollection nodes)
         {
             var index = largeIconList.Count;

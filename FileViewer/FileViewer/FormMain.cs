@@ -65,6 +65,8 @@ namespace FileViewer
         {
             using (var worker = new WorkerProgressForm())
             {
+                FileManager.DeleteTempDirectory(_decompressedDirectoryPath);
+
                 _decompressedDirectoryPath = FileManager.GetTempDirectory();
                 
                 var param = new WorkerProgressForm.WorkerParameter();
@@ -79,6 +81,7 @@ namespace FileViewer
 
                     imageListLargeIcon.Images.AddRange(result.LargeIconList.ToArray());
                     imageListSmallIcon.Images.AddRange(result.SmallIconList.ToArray());
+                    treeViewFile.Nodes.Clear();
                     treeViewFile.Nodes.Add(result.RootNode.FirstNode);
 
                     SetCurrentNode(treeViewFile.Nodes);
@@ -99,7 +102,7 @@ namespace FileViewer
 
             foreach (TreeNode node in nodes)
             {
-                var fileInfo = (FileManager.Info)node.Tag;
+                var fileInfo = node.Tag as FileManager.Info;
 
                 ListViewItem item;
                 if (Directory.Exists(fileInfo.FilePath))
@@ -213,7 +216,7 @@ namespace FileViewer
             splitContainerMain.SplitterDistance = Properties.Settings.Default.SplitterDistance;
             toolStripComboBoxViewStyle.SelectedIndex = Properties.Settings.Default.ViewStyleIndex;
 
-            ComboBoxItem item = (ComboBoxItem)toolStripComboBoxViewStyle.Items[toolStripComboBoxViewStyle.SelectedIndex];
+            ComboBoxItem item = toolStripComboBoxViewStyle.Items[toolStripComboBoxViewStyle.SelectedIndex] as ComboBoxItem;
             listViewFile.View = item.View;
         }
 
@@ -224,7 +227,7 @@ namespace FileViewer
         /// <param name="e"></param>
         private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
         {
-            FileManager.Delete(_decompressedDirectoryPath);
+            FileManager.DeleteTempDirectory(_decompressedDirectoryPath);
 
             if (this.WindowState == FormWindowState.Normal)
             {
@@ -243,11 +246,11 @@ namespace FileViewer
         /// <param name="e"></param>
         private void treeViewFile_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            TreeNode node = GetSelectedNode(((TreeView)sender).Nodes);
+            TreeNode node = GetSelectedNode((sender as TreeView).Nodes);
 
             if (node != null)
             {
-                var fileInfo = (FileManager.Info)node.Tag;
+                var fileInfo = node.Tag as FileManager.Info;
 
                 SetCurrentNode(Directory.Exists(fileInfo.FilePath) ? node.Nodes : node.Parent.Nodes);
             }
@@ -260,12 +263,12 @@ namespace FileViewer
         /// <param name="e"></param>
         private void listViewFile_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            var clickedItem = ((ListView)sender).HitTest(e.Location).Item;
+            var clickedItem = (sender as ListView).HitTest(e.Location).Item;
 
             if (clickedItem != null)
             {
-                var treeNode = (TreeNode)clickedItem.Tag;
-                var fileInfo = (FileManager.Info)treeNode.Tag;
+                var treeNode = clickedItem.Tag as TreeNode;
+                var fileInfo = treeNode.Tag as FileManager.Info;
 
                 if (Directory.Exists(fileInfo.FilePath))
                 {
@@ -287,11 +290,11 @@ namespace FileViewer
         /// <param name="e"></param>
         private void treeViewFile_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            var clickedItem = ((TreeView)sender).HitTest(e.Location).Node;
+            var clickedItem = (sender as TreeView).HitTest(e.Location).Node;
 
             if (clickedItem != null)
             {
-                var fileInfo = (FileManager.Info)clickedItem.Tag;
+                var fileInfo = clickedItem.Tag as FileManager.Info;
 
                 if (!Directory.Exists(fileInfo.FilePath))
                 {
@@ -343,8 +346,8 @@ namespace FileViewer
             {
                 if (item.Selected)
                 {
-                    var node = (TreeNode)item.Tag;
-                    var fileInfo = (FileManager.Info)node.Tag;
+                    var node = item.Tag as TreeNode;
+                    var fileInfo = node.Tag as FileManager.Info;
                     files.Add(fileInfo.FilePath);
                 }
             }
@@ -395,7 +398,7 @@ namespace FileViewer
         /// <param name="e"></param>
         private void splitContainerMain_SplitterMoved(object sender, SplitterEventArgs e)
         {
-            Properties.Settings.Default.SplitterDistance = ((SplitContainer)sender).SplitterDistance;
+            Properties.Settings.Default.SplitterDistance = (sender as SplitContainer).SplitterDistance;
         }
 
         /// <summary>
@@ -407,7 +410,7 @@ namespace FileViewer
         {
             if (toolStripComboBoxViewStyle.Selected)
             {
-                ComboBoxItem item = (ComboBoxItem)toolStripComboBoxViewStyle.Items[toolStripComboBoxViewStyle.SelectedIndex];
+                ComboBoxItem item = toolStripComboBoxViewStyle.Items[toolStripComboBoxViewStyle.SelectedIndex] as ComboBoxItem;
                 listViewFile.View = item.View;
             }
         }

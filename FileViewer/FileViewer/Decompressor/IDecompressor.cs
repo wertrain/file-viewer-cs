@@ -50,7 +50,8 @@ namespace FileViewer.Decompressor
                 {
                     FileName = fileName,
                     Arguments = string.Join(" ", args),
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
                 }
             };
             if (process.Start())
