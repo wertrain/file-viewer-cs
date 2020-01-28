@@ -63,6 +63,16 @@ namespace FileViewer
         /// <returns></returns>
         private bool DecompressAndOpen(string path)
         {
+            if (!File.Exists(path))
+            {
+                return false;
+            }
+
+            if (Path.GetExtension(path) != _decompressor.Extension)
+            {
+                return false;
+            }
+
             using (var worker = new WorkerProgressForm())
             {
                 FileManager.DeleteTempDirectory(_decompressedDirectoryPath);
@@ -388,7 +398,44 @@ namespace FileViewer
         /// <param name="e"></param>
         private void toolStripMenuItemHelpVersionInfo_Click(object sender, EventArgs e)
         {
+            using (var form = new Form())
+            {
+                form.SuspendLayout();
+                form.StartPosition = FormStartPosition.CenterParent;
+                form.AutoScaleDimensions = new SizeF(6F, 12F);
+                form.AutoScaleMode = AutoScaleMode.Font;
+                form.ClientSize = new Size(230, 60);
+                form.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+                form.Text = "バージョン情報";
 
+                var iconPictureBox = new PictureBox();
+                iconPictureBox.Image = Icon.ToBitmap();
+                iconPictureBox.Width = Icon.Width;
+                iconPictureBox.Height = Icon.Height;
+                iconPictureBox.Left = 20;
+                iconPictureBox.Top = 15;
+                form.Controls.Add(iconPictureBox);
+
+                var fileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(
+                    System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+                var versionLabel = new Label();
+                versionLabel.Text = fileVersionInfo.ProductName + " " + fileVersionInfo.FileVersion.ToString();
+                versionLabel.AutoSize = true;
+                versionLabel.Left = iconPictureBox.Left + iconPictureBox.Width + 15;
+                versionLabel.Top = iconPictureBox.Top + (iconPictureBox.Height / 2) - 15;
+                form.Controls.Add(versionLabel);
+
+                var copyrightLabel = new Label();
+                copyrightLabel.Text = fileVersionInfo.LegalCopyright;
+                copyrightLabel.AutoSize = true;
+                copyrightLabel.Left = versionLabel.Left;
+                copyrightLabel.Top = versionLabel.Top + versionLabel.Height + 5;
+                form.Controls.Add(copyrightLabel);
+
+                form.ResumeLayout(false);
+                form.ShowDialog(this);
+            }
         }
 
         /// <summary>
