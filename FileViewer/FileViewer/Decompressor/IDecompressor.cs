@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace FileViewer.Decompressor
 {
@@ -44,11 +46,26 @@ namespace FileViewer.Decompressor
         /// <returns></returns>
         public static bool Start(string fileName, List<string> args)
         {
+            var toolFullPath = fileName;
+
+            if (!File.Exists(toolFullPath))
+            {
+                var current = Environment.CurrentDirectory;
+                Environment.CurrentDirectory = Path.GetDirectoryName(Application.ExecutablePath);
+                toolFullPath = Path.GetFullPath(fileName);
+                Environment.CurrentDirectory = current;
+
+                if (!File.Exists(toolFullPath))
+                {
+                    return false;
+                }
+            }
+
             var process = new System.Diagnostics.Process
             {
                 StartInfo = new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName = fileName,
+                    FileName = toolFullPath,
                     Arguments = string.Join(" ", args),
                     UseShellExecute = false,
                     CreateNoWindow = true,
