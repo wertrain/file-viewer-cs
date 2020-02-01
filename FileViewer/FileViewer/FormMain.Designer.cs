@@ -56,7 +56,6 @@
             this.listViewFile = new System.Windows.Forms.ListView();
             this.imageListLargeIcon = new System.Windows.Forms.ImageList(this.components);
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.imageListThumbnails = new System.Windows.Forms.ImageList(this.components);
             this.menuStripMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
@@ -296,12 +295,6 @@
             // 
             this.openFileDialog.RestoreDirectory = true;
             // 
-            // imageListThumbnails
-            // 
-            this.imageListThumbnails.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.imageListThumbnails.ImageSize = new System.Drawing.Size(16, 16);
-            this.imageListThumbnails.TransparentColor = System.Drawing.Color.Transparent;
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -354,7 +347,6 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemView;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBoxViewStyle;
-        private System.Windows.Forms.ImageList imageListThumbnails;
     }
 }
 

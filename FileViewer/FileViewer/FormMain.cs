@@ -168,7 +168,6 @@ namespace FileViewer
             toolStripComboBoxViewStyle.Items.Add(new ComboBoxItem("リスト表示", View.List));
             toolStripComboBoxViewStyle.Items.Add(new ComboBoxItem("詳細表示", View.Details));
             toolStripComboBoxViewStyle.Items.Add(new ComboBoxItem("タイル", View.Tile));
-            toolStripComboBoxViewStyle.Items.Add(new ComboBoxItem("サムネイル", View.LargeIcon));
 
             // ToolStripMenu の「編集」をそのままコンテキストメニューに
             var contextMenuStrip = new ContextMenuStrip();
